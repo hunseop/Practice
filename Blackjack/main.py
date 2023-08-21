@@ -58,39 +58,6 @@
 
 #Hint 14: Ask the user if they want to restart the game. If they answer yes, clear the console and start a new game of blackjack and show the logo from art.py.
 
-
-
-
-
-
-
-
-
-
-# 2 개의 랜덤 카드 값의 시작 핸드를 사용자와 컴퓨터 모두에 적용하십시오.
-
-# 컴퓨터 나 사용자에게 블랙 잭이있는시기를 감지하십시오. ( 에이스 + 10 가치 카드 ).
-
-# 컴퓨터에 블랙 잭이 있으면 사용자에게 블랙 잭 (이 있어도 )이 손실됩니다. 사용자가 블랙 잭을 받으면 컴퓨터에 블랙 잭 (이없는 한 )을 얻습니다.
-
-# 카드 값을 기준으로 사용자와 컴퓨터의 점수를 계산하십시오.
-
-# 에이스가 그려지면 11로 계산하십시오. 그러나 총계가 21을 초과하면 에이스를 1로 계산하십시오.
-
-# 컴퓨터의 첫 번째 카드를 사용자에게 공개하십시오.
-
-# 사용자 점수가 21을 초과하거나 사용자 또는 컴퓨터가 블랙 잭을 받으면 게임이 즉시 종료됩니다.
-
-# 다른 카드를 받으려면 사용자에게 문의하십시오.
-
-# 사용자가 완료되고 더 이상 카드를 더 이상 그리지 않으려면 컴퓨터를 재생하십시오. 점수가 16을 넘지 않는 한 컴퓨터는 계속 카드를 뽑아야합니다.
-
-# 사용자와 컴퓨터 점수를 비교하고 그것이 승리, 손실 또는 추첨인지 확인하십시오.
-
-# 게임이 끝날 때 플레이어와 컴퓨터의 최종 핸드와 점수를 인쇄하십시오.
-
-# 게임이 끝나면 사용자에게 다시 게임을하고 싶은지 물어보십시오. 새로 시작하려면 콘솔을 비 웁니다.
-
 import random
 import os
 
@@ -102,52 +69,62 @@ com_cards = []
 def deal_card(deck):
   return deck.append(random.choice(cards))
 
-def calculate_deck(deck):
-  sum = 0
-  have_ace = False
-  for card in deck:
-    if card == 11:
-      have_ace = True
-    sum += card
-    
-  if sum > 21:
-    if have_ace:
-      sum -= 10
-      
-  return sum
+def calculate_score(deck):
+  score = sum(deck)
+  if score > 21:
+    if 11 in deck:
+      deck.remove(11)
+      deck.append(1)
 
-deal_card(my_cards)
-deal_card(com_cards)
-game_state = input("Do you want to play a game of Blackjack? Type 'y' or 'n':")
-while game_state == "y":
+  return sum(deck)
+
+while True:
+  print("Welcome to BlackJack Game!")
   deal_card(my_cards)
   deal_card(com_cards)
-
-  sum_my_cards = calculate_deck(my_cards)
-  sum_com_cards = calculate_deck(com_cards)
-
-  if sum_com_cards == 21:
-    print("You lose")
-    break
-
-  if sum_my_cards == 21:
-    print("You Win")
-    break
-
-  print(f"You: {my_cards}")
+  deal_card(my_cards)
+  deal_card(com_cards)
+  print(f"You: {my_cards}({calculate_score(my_cards)})")
   print(f"COM: {com_cards[0]}")
-  
-  game_state = input("more card? y/n?")
 
-if sum_my_cards == sum_com_cards:
-  os.system('cls')
-  print("Draw")
-elif sum_my_cards > sum_com_cards:
-  os.system('cls')
-  print("Win")
-elif sum_my_cards < sum_com_cards:
-  os.system('cls')
-  print("Lose")
-  
-print(f"You: {my_cards}")
-print(f"COM: {com_cards}")
+  while True:
+    
+    if calculate_score(com_cards) == 21:
+      break
+    elif calculate_score(my_cards) == 21:
+      break
+    elif calculate_score(my_cards) > 21:
+      break
+
+    turn_state = input("more card? y/n?")
+    if turn_state.lower() == "y":
+      os.system("clear")
+      deal_card(my_cards)
+      if calculate_score(com_cards) < 17:
+        deal_card(com_cards)
+      print(f"You: {my_cards}({calculate_score(my_cards)})")
+      print(f"COM: {com_cards[0]}")
+    else:
+      if calculate_score(com_cards) < 17:
+        deal_card(com_cards)
+      break
+
+  os.system("clear")
+  print(f"You: {my_cards}({calculate_score(my_cards)})")
+  print(f"COM: {com_cards}({calculate_score(com_cards)})")
+  if calculate_score(com_cards) > 21 and calculate_score(my_cards) < 22:
+    print("You Win :)")
+  elif calculate_score(my_cards) > 21 and calculate_score(com_cards) < 22:
+    print("You Lose :(")
+  elif calculate_score(my_cards) == calculate_score(com_cards):
+    print("Draw")
+  elif calculate_score(my_cards) > calculate_score(com_cards):
+    print("You Win :)")
+  elif calculate_score(my_cards) < calculate_score(com_cards):
+    print("You Lose :(")
+    
+  print("Game End")
+  game_state = input("Do you want to play a game of Blackjack? Type 'y' or 'n':")
+  if game_state.lower() != "y":
+    os.system("clear")
+    break
