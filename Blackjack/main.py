@@ -128,3 +128,5 @@ while True:
   if game_state.lower() != "y":
     os.system("clear")
     break
+  
+  print('this is test')
